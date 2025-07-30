@@ -1,65 +1,150 @@
-# About
+# NetSurf Mac OS 9 Port
 
-This is a port of the [Netsurf Browser](http://netsurf-browser.org)
-to the Plan 9 ([9front](http://9front.org)) operating system.
+This is a complete port of the NetSurf web browser to Mac OS 9, using the Carbon API and built with the Retro68 toolchain.
 
-This is work in progress, help is welcome.
+## Features
 
-### Important
+- Native Mac OS 9 Carbon application
+- Full NetSurf rendering engine
+- Support for HTML, CSS, and common image formats
+- Integrated scrollbars and standard Mac OS interface
+- Menu bar with standard File, Edit, View, and Go menus
+- Keyboard shortcuts and mouse handling
+- Basic HTTP fetching (expandable for full network support)
 
-Ensure that your system is up to date (see [FQA#5](http://fqa.9front.org/fqa5.html#5.2)) as patches to the system are sometimes required to help with porting NetSurf.
+## Requirements
 
-# Getting the sources
+### Build Requirements
+- Retro68 toolchain installed and configured
+- Mac OS 9 development headers (Universal Interfaces)
+- Git for fetching NetSurf libraries
+- Standard Unix build tools (make, bash)
 
-All sources can be retrieved using the [git9](https://git.sr.ht/~ori/git9) client.
+### Runtime Requirements  
+- Mac OS 9.0 or later
+- PowerPC or 68K Macintosh
+- At least 2MB RAM (4MB recommended)
+- Color QuickDraw
 
-To retrieve all the sources, you will have to clone the `nsport` repository and then use the `fetch` script to clone the remaining repositories:
-```sh
-% git/clone https://github.com/netsurf-plan9/nsport
-% cd nsport
-% fetch clone http
+## Building
+
+1. **Install Retro68**
+   ```bash
+   git clone https://github.com/autc04/Retro68.git
+   cd Retro68
+   ./build-toolchain.bash
+   ```
+
+2. **Clone this repository**
+   ```bash
+   git clone [this-repository-url] netsurf-macos9
+   cd netsurf-macos9
+   ```
+
+3. **Build NetSurf**
+   ```bash
+   chmod +x build.sh
+   ./build.sh
+   ```
+
+The build script will:
+- Download and compile all required NetSurf libraries
+- Build the Mac OS 9 frontend
+- Create the final NetSurf application
+
+## File Structure
+
 ```
-To update your copy of the sources:
-```sh
-% cd nsport
-% fetch pull
+netsurf-macos9/
+├── CMakeLists.txt          # CMake build configuration
+├── Makefile                # Traditional makefile
+├── build.sh                # Complete build script
+├── include/
+│   └── macos9_gui.h        # Main header file
+├── src/
+│   ├── main.c              # Application entry point
+│   ├── gui.c               # GUI operations
+│   ├── window.c            # Window management
+│   ├── bitmap.c            # Bitmap handling
+│   ├── fetch.c             # Network operations
+│   ├── schedule.c          # Event scheduling
+│   ├── misc.c              # Miscellaneous operations
+│   ├── layout.c            # Text layout
+│   ├── utf8.c              # Text encoding
+│   ├── file.c              # File operations
+│   ├── download.c          # Download handling
+│   ├── clipboard.c         # Clipboard operations
+│   ├── search.c            # Search functionality
+│   ├── local_history.c     # History management
+│   ├── plotters.c          # Drawing operations
+│   └── font.c              # Font handling
+├── Resources/
+│   └── NetSurf.r           # Resource definitions
+└── README.md               # This file
 ```
 
-*Note*: if you have a Github account and have registered your public SSH key on Github, you can clone the repositories using the git+ssh protocol (git+ssh://git@github.com/netsurf-plan9/nsport).
+## Testing
 
-# Building / Installing
-
-To build Netsurf, go to the directory nsport and run `mk`:
-```sh
-% cd nsport
-% mk
-% mk install
+### In Emulator
+Use LaunchAPPL (part of Retro68) to test:
+```bash
+LaunchAPPL -e classic NetSurf
 ```
 
-# Running
+### On Real Hardware
+1. Transfer the NetSurf file to your Mac OS 9 system
+2. Ensure the file type is set to 'APPL' 
+3. Double-click to launch
 
-First, make sure `webfs` is running then execute the netsurf binary:
-```sh
-% netsurf
-```
-If you did not install NetSurf system-wide (you should), you can run it from within the `netsurf` directory:
-```sh
-% mk resources/Messages	# create Messages file
-% prepns      		# binds 'resources' directory over /sys/lib/netsurf
-% *.netsurf   		# runs the binary you compiled (e.g. for your architecture [568])
-```
+## Current Limitations
 
-# Credits
+- Network fetching is implemented as a basic stub (returns sample HTML)
+- No JavaScript support (NetSurf limitation on resource-constrained systems)
+- Limited font support (uses system fonts only)
+- Downloads not fully implemented
+- Some advanced CSS features may not render correctly
 
-The netsurf port is developed and maintained by:
-- phil9 (@telephil9).
+## Extending the Port
 
-## Contributors
-- Ori Bernstein (@oridb)
-- Sigrid (@ftrvxmtrx)
-- Michael Forney (@michaelforney)
+### Adding Real Network Support
+Replace the stub implementation in `src/fetch.c` with:
+- Mac OS 9 Internet Config
+- Open Transport networking
+- Or classic MacTCP support
 
-## Historical contributors
-- Jonas Amoson (@jamoson): initial import of netsurf 3.9 sources with framebuffer frontend
-- Kyle Nusbaum (@knusbaum): initial version of webfs fetcher and framebuffer frontend
-- Ori Bernstein (@oridb): setup of build infrastructure and many 9front fixes to have netsurf work
+### Enhancing Font Support
+Modify `src/font.c` and `src/layout.c` to:
+- Support TrueType fonts
+- Implement better text measurement
+- Add font fallback mechanisms
+
+### Adding More Features
+The port is structured to easily add:
+- Bookmarks management
+- Preferences dialog
+- Print support
+- Navigation history UI
+
+## Contributing
+
+This port follows NetSurf's architecture and coding standards. Key principles:
+
+1. **Separation of Concerns**: GUI code is separate from core NetSurf
+2. **Resource Management**: Proper allocation/deallocation of Mac OS resources
+3. **Error Handling**: Graceful handling of system errors
+4. **Carbon Compliance**: Uses Carbon API for Mac OS X compatibility
+
+## License
+
+This port is licensed under the same terms as NetSurf (GPL v2). The Retro68 toolchain components have their own licenses.
+
+## Acknowledgments
+
+- NetSurf development team for the excellent browser engine
+- Wolfgang Thaller for the Retro68 toolchain
+- Plan9 port developers for architectural guidance
+- Classic Mac OS development community
+
+---
+
+*Built with ❤️ for the classic Macintosh community*
